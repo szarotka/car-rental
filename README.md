@@ -7,6 +7,13 @@ Features
 - Inventory limits per car type.
 - Reactive controller and a simple in-memory inventory.
 
+## High level design
+
+![CarRental-sequence.drawio.png](docs/CarRental-sequence.drawio.png)
+
+## Model
+![CarRental-Entities.drawio.png](docs/CarRental-Entities.drawio.png)
+
 Run tests
 
 On Windows (cmd.exe) with Gradle installed:

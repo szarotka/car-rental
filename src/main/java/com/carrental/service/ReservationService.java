@@ -4,14 +4,16 @@ import com.carrental.dto.ReservationRequest;
 import com.carrental.model.CarType;
 import com.carrental.model.Inventory;
 import com.carrental.model.Reservation;
+import lombok.Getter;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
+@Getter
 @Service
 public class ReservationService {
+    // Expose inventory for tests
     private final Inventory inventory;
 
     public ReservationService() {
@@ -37,9 +39,5 @@ public class ReservationService {
         );
     }
 
-    // Expose inventory for tests
-    public Inventory getInventory() {
-        return inventory;
-    }
 }
 
