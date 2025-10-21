@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  car-rental-service:
+    image: openjdk:25-jdk
+    container_name: car-rental
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: ./gradlew bootRun
