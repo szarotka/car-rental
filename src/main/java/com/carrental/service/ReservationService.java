@@ -1,43 +1,32 @@
 package com.carrental.service;
 
 import com.carrental.dto.ReservationRequest;
-import com.carrental.model.CarType;
-import com.carrental.model.Inventory;
-import com.carrental.model.Reservation;
-import lombok.Getter;
-import org.springframework.stereotype.Service;
+import com.carrental.dto.ReservationResponse;
+import com.carrental.model.Car;
+import com.carrental.repository.ReservationRepository;
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
-@Getter
-@Service
+@RequiredArgsConstructor
 public class ReservationService {
-    // Expose inventory for tests
-    private final Inventory inventory;
 
-    public ReservationService() {
-        // default capacities: Sedan 3, SUV 2, VAN 1
-        this.inventory = new Inventory(Map.of(
-                CarType.SEDAN, 3,
-                CarType.SUV, 2,
-                CarType.VAN, 1
-        ));
-    }
+    private final ReservationRepository reservationRepository;
 
-    // For tests to inject custom inventory
-    public ReservationService(Inventory inventory) {
-        this.inventory = inventory;
-    }
-
-    public Mono<Reservation> reserve(ReservationRequest req) {
-        if (req == null || req.getCarType() == null || req.getStart() == null || req.getDays() <= 0) {
+    public Mono<ReservationResponse> reserve(ReservationRequest request) {
+        if (request == null || request.carType() == null || request.start() == null || request.days() <= 0) {
             return Mono.error(new IllegalArgumentException("Invalid reservation request"));
         }
-        return Mono.fromCallable(() -> inventory.reserve(req.getCarType(), req.getStart(), req.getDays())
-                .orElseThrow(() -> new IllegalStateException("No cars available for the requested type/time"))
-        );
+        return reservationRepository.findFirstAvailableCar(request.carType(), request.start(), request.days())
+                .map(car -> reserve(car, request))
+                .orElse(Mono.error(new IllegalStateException("No cars available for the requested type/time")));
     }
 
+    private Mono<ReservationResponse> reserve(Car car, ReservationRequest request) {
+        return reservationRepository.createReservation(car, request.start(), request.days(), request.customerId())
+                .map(reservation -> new ReservationResponse(
+                        reservation.id(),
+                        reservation.carType().name(),
+                        reservation.start(),
+                        reservation.days()));
+    }
 }
-

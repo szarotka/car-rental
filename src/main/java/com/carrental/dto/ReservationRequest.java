@@ -1,20 +1,10 @@
 package com.carrental.dto;
 
 import com.carrental.model.CarType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class ReservationRequest {
-    private CarType carType;
-    private LocalDateTime start;
-    private int days;
+public record ReservationRequest(CarType carType, LocalDateTime start, int days, UUID customerId) {
 }
 

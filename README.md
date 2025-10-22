@@ -26,18 +26,18 @@ Or generate Gradle wrapper and use it locally:
 
 ```
 gradle wrapper
-gradlew test
+ .\gradlew test
 ```
 
 Build Docker image and run with compose:
 
 ```
-gradle bootJar
+.\gradlew bootJar
 docker-compose up --build
 ```
 
 API
-POST /reservations
+POST /reservation
 Body: JSON {"carType":"SEDAN","start":"2025-10-25T10:00:00","days":3}
 
 Notes
