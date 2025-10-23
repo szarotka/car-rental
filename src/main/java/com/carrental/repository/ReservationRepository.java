@@ -4,24 +4,22 @@ import com.carrental.model.Car;
 import com.carrental.model.CarType;
 import com.carrental.model.Reservation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
+@Slf4j
 @RequiredArgsConstructor
 public class ReservationRepository {
 
     private final List<Reservation> reservations = new ArrayList<>();
 
     private final CarRepository carRepository;
-
-    public void addReservation(Reservation reservation) {
-        reservations.add(reservation);
-    }
+    private final Map<UUID, ReentrantLock> lockForCarId = new ConcurrentHashMap<>();
 
     public Optional<Car> findFirstAvailableCar(CarType carType, LocalDateTime start, int days) {
         return carRepository.getCars().stream()
@@ -43,8 +41,25 @@ public class ReservationRepository {
     }
 
     public Mono<Reservation> createReservation(Car car, LocalDateTime start, int days, UUID customerId) {
-        Reservation reservation = new Reservation(java.util.UUID.randomUUID(), car.type(), start, days, car.id(), customerId);
-        addReservation(reservation);
-        return Mono.just(reservation);
+        lockForCarId.computeIfAbsent(car.id(), carId -> new ReentrantLock());
+        ReentrantLock lock = lockForCarId.get(car.id());
+        lock.lock();
+        try {
+            if (!isAvailable(car, start, days)) {
+                log.error("Attempted to create reservation for unavailable car: {}", car.id());
+                return Mono.error(new IllegalStateException("Car is not available for the requested time period"));
+            }
+            Reservation reservation = new Reservation(java.util.UUID.randomUUID(), car.type(), start, days, car.id(), customerId);
+            addReservation(reservation);
+            return Mono.just(reservation);
+        } finally {
+            lock.unlock();
+            lockForCarId.remove(car.id());
+        }
     }
+
+    private void addReservation(Reservation reservation) {
+        reservations.add(reservation);
+    }
+
 }
