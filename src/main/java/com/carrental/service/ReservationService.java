@@ -5,8 +5,10 @@ import com.carrental.dto.ReservationResponse;
 import com.carrental.model.Car;
 import com.carrental.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+@Service
 @RequiredArgsConstructor
 public class ReservationService {
 

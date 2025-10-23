@@ -32,7 +32,6 @@ gradle wrapper
 Build Docker image and run with compose:
 
 ```
-.\gradlew bootJar
 docker-compose up --build
 ```
 
@@ -40,6 +39,12 @@ API
 POST /reservation
 Body: JSON {"carType":"SEDAN","start":"2025-10-25T10:00:00","days":3}
 
+Example:
+
+curl -d '{"carType":"SEDAN","start":"2025-10-25T10:00:00","days":3}' -H "Content-Type: application/json" -X POST http://localhost:8080/reservation
+
+Response: {"id":"f51bd597-6c9a-4074-b1cb-94e572e5ae8a","carType":"SEDAN","start":"2025-10-25T10:00:00","days":3,"registrationNumber":"ABC-123"}
+
 Notes
-- This project includes sample capacities (Sedan 3, SUV 2, Van 1) in the service constructor. Tests use a custom inventory to validate edge cases.
+- This project includes sample capacities defined in CarRepository (Sedan 1, SUV 2, Van 1).
 

@@ -3,33 +3,23 @@ package com.carrental.controller;
 import com.carrental.dto.ReservationRequest;
 import com.carrental.dto.ReservationResponse;
 import com.carrental.model.CarType;
-import com.carrental.repository.CarRepository;
-import com.carrental.repository.ReservationRepository;
-import com.carrental.service.ReservationService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ReservationControllerWebTest {
 
+    @Autowired
     private WebTestClient client;
-
-    @BeforeEach
-    void setUp() {
-        CarRepository carRepository = new CarRepository();
-        ReservationRepository reservationRepository = new ReservationRepository(carRepository);
-        ReservationService service = new ReservationService(reservationRepository);
-        ReservationController controller = new ReservationController(service);
-
-        this.client = WebTestClient.bindToController(controller)
-                .build();
-    }
 
     @Test
     void reserveReturnsOkAndBody_whenCarAvailable() {

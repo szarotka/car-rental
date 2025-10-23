@@ -2,10 +2,12 @@ package com.carrental.repository;
 
 import com.carrental.model.Car;
 import com.carrental.model.CarType;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
+@Repository
 public class CarRepository {
 
     private final List<Car> cars = List.of(
